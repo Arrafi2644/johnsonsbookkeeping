@@ -1,0 +1,244 @@
+@import "tailwindcss";
+
+/*
+ * Brand tokens, taken from the live site's Elementor kit:
+ *   navy  #0D2250 (accent)   gold #FDBB15 (primary)   cream #F3F4EF
+ *   sand  #E6E5E1            sage #B3C2B9             text  #737372
+ * Body copy uses a slightly deeper tint of #737372 to reach AA contrast on cream.
+ */
+:root {
+  --background: #f6f8fc;
+  --foreground: #0b1f5c;
+  --card: #ffffff;
+  --muted: #eaeff8;
+  --muted-foreground: #55607a;
+  --border: #dbe3f0;
+  --primary: #0b1f5c;
+  --primary-foreground: #ffffff;
+  --accent: #ffb81c;
+  --accent-foreground: #0b1f5c;
+  /* Dark gold for text and icons on light backgrounds; --accent itself fails contrast on white. */
+  --accent-ink: #8a5f00;
+  --sage: #b3c2b9;
+  --ring: #ffb81c;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-ink: var(--accent-ink);
+  --color-sage: var(--sage);
+  --color-ring: var(--ring);
+  --font-sans: "Radio Canada Big Variable", system-ui, sans-serif;
+  --font-serif: "Fraunces Variable", Georgia, serif;
+}
+
+@layer base {
+  * { @apply border-border; }
+  html { scroll-behavior: smooth; scroll-padding-top: 5rem; }
+  body { @apply bg-background font-sans text-foreground antialiased; }
+  h1, h2, h3 { @apply font-serif font-medium tracking-tight text-balance; }
+  :focus-visible { @apply outline-2 outline-offset-2 outline-ring; }
+  .on-dark :focus-visible { @apply outline-accent; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+}
+
+/* Mobile menu panel: slides in from the right when opened. */
+@keyframes panel-in { from { transform: translateX(100%); } to { transform: none; } }
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fade-up { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: none; } }
+@keyframes link-in { from { opacity: 0; transform: translateX(28px); } to { opacity: 1; transform: none; } }
+@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@keyframes float-y { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+@keyframes shimmer { to { background-position: 200% center; } }
+@keyframes drift { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(30px, -24px) scale(1.12); } }
+@keyframes pop-in { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: none; } }
+@keyframes pulse-ring { 0% { box-shadow: 0 0 0 0 rgb(253 187 21 / 0.55); } 100% { box-shadow: 0 0 0 14px rgb(253 187 21 / 0); } }
+@keyframes panel-out { from { transform: none; } to { transform: translateX(100%); } }
+@keyframes fade-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes nav-in { from { opacity: 0; transform: translateY(8px) scale(0.98); } to { opacity: 1; transform: none; } }
+@keyframes nav-out { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(8px) scale(0.98); } }
+@keyframes nav-from-start { from { opacity: 0; transform: translateX(-14px); } to { opacity: 1; transform: none; } }
+@keyframes nav-from-end { from { opacity: 0; transform: translateX(14px); } to { opacity: 1; transform: none; } }
+@keyframes nav-to-start { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateX(-14px); } }
+@keyframes nav-to-end { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateX(14px); } }
+.menu-panel[data-state="open"] { animation: panel-in 0.38s cubic-bezier(0.22, 1, 0.36, 1); }
+.menu-panel[data-state="closed"] { animation: panel-out 0.25s ease-in both; }
+.menu-overlay[data-state="open"] { animation: fade-in 0.25s ease-out; }
+.menu-overlay[data-state="closed"] { animation: fade-out 0.25s ease-in both; }
+
+/* Desktop nav panels (Radix NavigationMenu): fade + 8px rise + slight scale in 160ms. */
+.nav-panel { transform-origin: top center; }
+.nav-panel[data-state="open"] { animation: nav-in 160ms ease-out both; }
+.nav-panel[data-state="closed"] { animation: nav-out 120ms ease-in both; }
+/* When the pointer moves between two menus, slide sideways instead of rising. */
+.nav-panel[data-motion="from-start"] { animation-name: nav-from-start; }
+.nav-panel[data-motion="from-end"] { animation-name: nav-from-end; }
+.nav-panel[data-motion="to-start"] { animation-name: nav-to-start; }
+.nav-panel[data-motion="to-end"] { animation-name: nav-to-end; }
+.menu-link { animation: link-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: calc(var(--i, 0) * 60ms + 120ms); }
+
+@layer components {
+  /* Scroll reveal: Reveal toggles data-in once the element enters the viewport. */
+  .reveal {
+    opacity: 0;
+    translate: 0 24px;
+    transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0ms), translate 0.6s cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0ms), scale 0.6s cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0ms);
+  }
+  .reveal[data-dir="left"] { translate: -24px 0; }
+  .reveal[data-dir="right"] { translate: 24px 0; }
+  .reveal[data-dir="scale"] { translate: 0 0; scale: 0.94; }
+  .reveal[data-in="true"] { opacity: 1; translate: 0 0; scale: 1; }
+
+  .fade-up { animation: fade-up 0.95s cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: var(--d, 0ms); }
+  .float-y { animation: float-y 6s ease-in-out infinite; }
+  .drift { animation: drift 16s ease-in-out infinite; }
+  .marquee-track { animation: marquee 42s linear infinite; }
+  .marquee:hover .marquee-track { animation-play-state: paused; }
+
+  /* Gold gradient that slowly travels across highlighted headline text (dark backgrounds only). */
+  .text-shimmer {
+    background-image: linear-gradient(100deg, #fdbb15 0%, #ffe493 40%, #fdbb15 80%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: shimmer 7s linear infinite;
+  }
+
+  .hero-grid {
+    background-image:
+      linear-gradient(to right, rgb(255 255 255 / 0.045) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(255 255 255 / 0.045) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 30%, transparent 100%);
+  }
+
+  /* Header link underline: scales in from the centre on hover, while open, and on the active route. */
+  .nav-underline { position: relative; }
+  .nav-underline::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 2px 0;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .nav-underline:hover::after,
+  .nav-underline:focus-visible::after,
+  .nav-underline[data-state="open"]::after,
+  .nav-underline[aria-current="page"]::after,
+  .nav-underline[data-active="true"]::after { transform: scaleX(1); }
+
+  /* Underline that draws in from the left on hover / for the active item. */
+  .link-underline { position: relative; }
+  .link-underline::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 -6px 0;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .link-underline:hover::after,
+  .link-underline[aria-current="true"]::after { transform: scaleX(1); transform-origin: left; }
+
+  /* Card lift: raise, deepen shadow, and draw a gold rule along the bottom edge. */
+  .card-lift {
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.5s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s;
+  }
+  .card-lift::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), #ffe493);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .card-lift:hover { transform: translateY(-8px); box-shadow: 0 30px 60px -24px rgb(13 34 80 / 0.38); }
+  .card-lift:hover::after { transform: scaleX(1); }
+  .card-lift .icon-pop { transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .card-lift:hover .icon-pop { transform: scale(1.12) rotate(-6deg); }
+}
+
+/* Cursor spotlight: Spotlight (client helper) feeds --mx / --my; the glow only shows for real hover pointers. */
+@layer components {
+  .spotlight { position: relative; }
+  .spotlight::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 300ms;
+    background: radial-gradient(320px circle at var(--mx, 50%) var(--my, 50%), color-mix(in oklab, var(--accent) 18%, transparent), transparent 70%);
+  }
+  .spotlight:focus-within::before { opacity: 1; }
+  @media (hover: hover) {
+    .spotlight:hover::before { opacity: 1; }
+  }
+}
+
+/* Slow float for decorative shapes (Why section). Disabled by the .hover-fx reduced-motion rule. */
+@keyframes float-slow { from { transform: translateY(0); } to { transform: translateY(10px); } }
+.float-slow { animation: float-slow 8s ease-in-out infinite alternate; }
+
+/* Service Area chips: a ring expands from the pin once per hover / focus. */
+@keyframes pin-pulse { from { transform: scale(0.8); opacity: 0.8; } to { transform: scale(1.6); opacity: 0; } }
+.pin-pulse::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  border: 2px solid var(--primary);
+  opacity: 0;
+  pointer-events: none;
+}
+.chip-link:focus-visible .pin-pulse::after { animation: pin-pulse 900ms ease-out 1; }
+@media (hover: hover) {
+  .chip-link:hover .pin-pulse::after { animation: pin-pulse 900ms ease-out 1; }
+}
+
+/* Stat ring: replays its draw when the stat column is hovered (offset runs from "hidden" to the final arc). */
+@keyframes ring-draw { from { stroke-dashoffset: var(--ring-from, 0); } to { stroke-dashoffset: 0; } }
+
+@media (scripting: none) {
+  .reveal { opacity: 1; translate: none; scale: 1; }
+}
+
+/* FAQ accordion: height is measured by Radix and exposed as a CSS variable. */
+@keyframes accordion-down { from { height: 0; } to { height: var(--radix-accordion-content-height); } }
+@keyframes accordion-up { from { height: var(--radix-accordion-content-height); } to { height: 0; } }
+.accordion-content { overflow: hidden; }
+.accordion-content[data-state="open"] { animation: accordion-down 0.25s ease-out; }
+.accordion-content[data-state="closed"] { animation: accordion-up 0.2s ease-out; }
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-panel, .menu-overlay, .nav-panel, .accordion-content, .menu-link, .fade-up, .float-y, .drift, .marquee-track, .text-shimmer { animation: none !important; }
+  .reveal { opacity: 1; translate: none; scale: 1; transition: none; }
+  .card-lift, .card-lift:hover { transform: none; }
+  /* Hover choreography in Stats and About: no movement, no spotlight. */
+  .hover-fx, .hover-fx * { transition: none !important; animation: none !important; translate: none !important; rotate: none !important; scale: none !important; }
+  .spotlight::before { display: none; }
+  .pin-pulse::after, .float-slow { animation: none !important; }
+  .chip-link { transform: none !important; translate: none !important; }
+}

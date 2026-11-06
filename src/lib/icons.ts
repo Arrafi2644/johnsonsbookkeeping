@@ -1,0 +1,37 @@
+import {
+  Award,
+  BookOpenCheck,
+  BriefcaseBusiness,
+  Building2,
+  FileSpreadsheet,
+  GraduationCap,
+  Layers,
+  Lightbulb,
+  MessageSquareText,
+  Percent,
+  Star,
+  Target,
+  ThumbsUp,
+  TrendingUp,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
+
+/** Icons referenced by name from `data/content.json`. Add new names here. */
+export const icons: Record<string, LucideIcon> = {
+  Award,
+  BookOpenCheck,
+  BriefcaseBusiness,
+  Building2,
+  FileSpreadsheet,
+  GraduationCap,
+  Layers,
+  Lightbulb,
+  MessageSquareText,
+  Percent,
+  Star,
+  Target,
+  ThumbsUp,
+  TrendingUp,
+  Users,
+};
